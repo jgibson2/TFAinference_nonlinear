@@ -1,14 +1,15 @@
 import csv
 import time
+import configparser
 
 from mystic.solvers import LatticeSolver, PowellDirectionalSolver
 
 from mysticRealMain import *
 
 """ProcessPool is a way that the optimization jobs can be split up for parallelization, ParallelPool is an alternative to ProcessPool, one or the other may be faster depending on the job"""
-from pathos.multiprocessing import ProcessPool as Pool
+# from pathos.multiprocessing import ProcessPool as Pool
 
-# from pathos.pools import ParallelPool as Pool
+from pathos.pools import ParallelPool as Pool
 
 """imports matrices as .csv files and makes lists of lists of numbers to represent them
 binaryCS matrix dimensions are numGenes x numTFs
@@ -16,7 +17,9 @@ binaryTFA matrix dimensions are numTFs x numSamples
 geneExpression matrix dimensions are numGenes x numSamples
 All .csv files are assumed to only have numbers and no labels
 If .csv files have labels, change 'for i in range(len(your_list))' to 'for i in range(1,len(your_list))' and change 'for j in range(len(your_list[0]))' to 'for j in range(1,len(your_list[0]))'"""
-with open("Data//binaryCS.csv") as f:
+config = configparser.ConfigParser()
+config.read('config.ini')
+with open(config['BinaryCS']) as f:
     reader = csv.reader(f)
     your_list = list(reader)
 signedBinaryCS = []
@@ -26,7 +29,7 @@ for i in range(len(your_list)):
         row.append(int(your_list[i][j]))
     signedBinaryCS.append(row)
 
-with open("Data//binaryTFAtrimmed.csv") as f:
+with open(config['BinaryTFA']) as f:
     reader = csv.reader(f)
     your_list = list(reader)
 binaryTFA = []
@@ -36,7 +39,7 @@ for i in range(len(your_list)):
         row.append(int(your_list[i][j]))
     binaryTFA.append(row)
 
-with open("Data//geneExpressiontrimmed.csv") as f:
+with open(config['GeneExpression']) as f:
     reader = csv.reader(f)
     your_list = list(reader)
 geneExpressionMatrix = []
@@ -84,6 +87,6 @@ for j in range(len(sol)):
         sol[j]))  # the solution is just a list of values, so this assigns each parameter to its corresponding value
 lst.append("time->" + str((stop - start) / 3600))  # the time in hours that the optimization took
 lst.append("error->" + str(proc.processDataForOptimizing(sol)))  # the error that the optimizer got
-with open("paramRulesMystic//paramRulesReal",
+with open(config['RulesOutput'],
           "w") as file:  # saves the parameters with their values, time, and error as a file
     file.write(str(lst))

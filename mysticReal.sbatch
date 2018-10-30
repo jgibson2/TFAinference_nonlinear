@@ -9,4 +9,4 @@
 
 module load python
 
-srun python mysticReal.py
+python mysticReal.py
